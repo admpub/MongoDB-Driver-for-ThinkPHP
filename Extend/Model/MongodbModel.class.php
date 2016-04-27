@@ -315,6 +315,69 @@ class MongodbModel extends Model{
     }
 
     /**
+     * 创建索引
+     * @param array $key 索引设置
+     * @param array $options 选项
+     * @return mixed
+     */
+    public function createIndex($key, $options = array()){
+        $options = $this->_parseOptions($options);
+        return $this->db->createIndex($key, $options);
+    }
+
+    /**
+     * 创建表
+     * @param string $table 表名称
+     * @param array $options 选项
+     * @return mixed
+     */
+    public function createTable($table, $options = array()){
+        $options = $this->_parseOptions($options);
+        return $this->db->createTable($table, $options);
+    }
+
+    /**
+     * 删除索引
+     * @param string $indexName 索引名称
+     * @param array $options 选项
+     * @return mixed
+     */
+    public function dropIndex($indexName, $options = array()){
+        $options = $this->_parseOptions($options);
+        return $this->db->dropIndex($indexName, $options);
+    }
+
+    /**
+     * 删除表
+     * @param string $table 表名称
+     * @param array $options 选项
+     * @return mixed
+     */
+    public function dropTable($table, $options = array()){
+        $options = $this->_parseOptions($options);
+        return $this->db->dropTable($table, $options);
+    }
+
+
+    /**
+     * 取得数据表的字段信息
+     * @access public
+     * @return array
+     */
+    public function getFields($collection = '', $database = '') {
+        return $this->db->getFields($collection, $database);
+    }
+
+    /**
+     * 取得当前数据库的collection信息
+     * @access public
+     */
+    public function getTables($database = '') {
+        return $this->db->getTables($database);
+    }
+
+
+    /**
      * 此条件ThinkPHP会原封不动的传给MongoDB PHPLIB
      * @param $conditon
      * @return mixed
@@ -353,7 +416,7 @@ class MongodbModel extends Model{
         }
     }
 
-    public function _parseOptions($options){
+    public function _parseOptions($options=array()){
         if(empty($options['database']))$options['database']=$this->dbName;
         return parent::_parseOptions($options);
     }
