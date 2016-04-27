@@ -200,7 +200,7 @@ class DbMongodb extends Db {
      */
     public function insert($data, $options = array(), $replace = false) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database']);
+            $this->switchCollection($options['table'], $options['database']);
         }
         $this->model = $options['model'];
         N('db_write', 1);
@@ -212,10 +212,10 @@ class DbMongodb extends Db {
         try {
             // 记录开始执行时间
             G('queryStartTime');
-            $opts=isset($options['options'])?$options['options']:array();
+            $opts = isset($options['options']) ? $options['options'] : array();
             $result = $replace ? $this->_collection->findOneAndReplace(array(
                 '_id' => is_object($data) ? $data->_id : $data['_id']
-            ), $data,$opts) : $this->_collection->insertOne($data,$opts);
+            ), $data, $opts) : $this->_collection->insertOne($data, $opts);
             $this->debug();
             if ($result) {
                 if ($result instanceof MongoDB\InsertOneResult) {
@@ -244,15 +244,15 @@ class DbMongodb extends Db {
      */
     public function insertAll($dataList, $options = array()) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database']);
+            $this->switchCollection($options['table'], $options['database']);
         }
         $this->model = $options['model'];
         N('db_write', 1);
         try {
             // 记录开始执行时间
             G('queryStartTime');
-            $opts=isset($options['options'])?$options['options']:array();
-            $result = $this->_collection->insertMany($dataList,$opts);
+            $opts = isset($options['options']) ? $options['options'] : array();
+            $result = $this->_collection->insertMany($dataList, $opts);
             $this->debug();
             return $result;
         } catch (\Exception $e) {
@@ -298,7 +298,7 @@ class DbMongodb extends Db {
      */
     public function update($data, $options) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database']);
+            $this->switchCollection($options['table'], $options['database']);
         }
         $this->model = $options['model'];
         N('db_write', 1);
@@ -312,11 +312,11 @@ class DbMongodb extends Db {
         try {
             // 记录开始执行时间
             G('queryStartTime');
-            $opts=isset($options['options'])?$options['options']:array();
+            $opts = isset($options['options']) ? $options['options'] : array();
             if (isset($options['limit']) && $options['limit'] == 1) {
-                $result = $this->_collection->updateOne($query, $set,$opts);
+                $result = $this->_collection->updateOne($query, $set, $opts);
             } else {
-                $result = $this->_collection->updateMany($query, $set,$opts);
+                $result = $this->_collection->updateMany($query, $set, $opts);
             }
             if ($result) {
                 $this->numRows = $result->getModifiedCount();
@@ -337,7 +337,7 @@ class DbMongodb extends Db {
      */
     public function delete($options = array()) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database']);
+            $this->switchCollection($options['table'], $options['database']);
         }
         $query = $this->parseWhere($options['where']);
         $this->model = $options['model'];
@@ -348,12 +348,12 @@ class DbMongodb extends Db {
         try {
             // 记录开始执行时间
             G('queryStartTime');
-            $opts=isset($options['options'])?$options['options']:array();
+            $opts = isset($options['options']) ? $options['options'] : array();
             if (isset($options['limit']) && $options['limit'] == 1) {
-                $result = $this->_collection->deleteOne($query,$opts);
+                $result = $this->_collection->deleteOne($query, $opts);
             } else {
                 if (!$query) throw_exception('没有指定数据的删除条件，这会导致全表被清空，不允许这么操作。');
-                $result = $this->_collection->deleteMany($query,$opts);
+                $result = $this->_collection->deleteMany($query, $opts);
             }
 
             if ($result) {
@@ -375,7 +375,7 @@ class DbMongodb extends Db {
      */
     public function clear($options = array()) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database']);
+            $this->switchCollection($options['table'], $options['database']);
         }
         $this->model = $options['model'];
         N('db_write', 1);
@@ -417,11 +417,11 @@ class DbMongodb extends Db {
         $field = $this->parseField($options['field']);
         try {
             if (C('DB_SQL_LOG')) {
-                if(isset($options['distinct'])){
-                    $this->queryStr = $this->_namespace() . '.distinct("'.$options['distinct'].'",';
+                if (isset($options['distinct'])) {
+                    $this->queryStr = $this->_namespace() . '.distinct("' . $options['distinct'] . '",';
                     $this->queryStr .= $query ? json_encode($query) : '{}';
                     $this->queryStr .= ')';
-                }else{
+                } else {
                     $this->queryStr = $this->_namespace() . '.find(';
                     $this->queryStr .= $query ? json_encode($query) : '{}';
                     $this->queryStr .= $field ? ',' . json_encode($field) : '';
@@ -430,7 +430,7 @@ class DbMongodb extends Db {
             }
             // 记录开始执行时间
             G('queryStartTime');
-            $opts=isset($options['options'])?$options['options']:array();
+            $opts = isset($options['options']) ? $options['options'] : array();
             if ($field) $opts['projection'] = $field;
             if ($options['order']) {
                 $order = $this->parseOrder($options['order']);
@@ -462,12 +462,12 @@ class DbMongodb extends Db {
                     $this->queryStr .= '.limit(' . intval($length) . ')';
                 }
                 $opts['limit'] = intval($length);
-                if($opts['limit']<1)$opts['limit']=20;
+                if ($opts['limit'] < 1) $opts['limit'] = 20;
             }
-            if(isset($options['distinct'])){
+            if (isset($options['distinct'])) {
                 $_cursor = $this->_collection->distinct($options['distinct'], $query, $opts);
                 $resultSet = $_cursor;//array(123,445,666)
-            }else{
+            } else {
                 $_cursor = $this->_collection->find($query, $opts);
                 $resultSet = iterator_to_array($_cursor);
             }
@@ -490,7 +490,7 @@ class DbMongodb extends Db {
      */
     public function find($options = array()) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database'], false);
+            $this->switchCollection($options['table'], $options['database'], false);
         }
         $cache = isset($options['cache']) ? $options['cache'] : false;
         if ($cache) { // 查询缓存检测
@@ -511,7 +511,7 @@ class DbMongodb extends Db {
             $this->queryStr .= ')';
         }
         try {
-            $opts=isset($options['options'])?$options['options']:array();
+            $opts = isset($options['options']) ? $options['options'] : array();
             // 记录开始执行时间
             G('queryStartTime');
             if ($fields) $opts['projection'] = $fields;
@@ -534,7 +534,7 @@ class DbMongodb extends Db {
      */
     public function count($options = array()) {
         if (isset($options['table'])) {
-            $this->switchCollection($options['table'],$options['database'], false);
+            $this->switchCollection($options['table'], $options['database'], false);
         }
         $cache = isset($options['cache']) ? $options['cache'] : false;
         if ($cache) { // 查询缓存检测
@@ -555,8 +555,8 @@ class DbMongodb extends Db {
         try {
             // 记录开始执行时间
             G('queryStartTime');
-            $opts=isset($options['options'])?$options['options']:array();
-            $count = $this->_collection->count($query,$opts);
+            $opts = isset($options['options']) ? $options['options'] : array();
+            $count = $this->_collection->count($query, $opts);
             $this->debug();
             if ($cache && is_numeric($count)) { // 查询缓存写入
                 S($key, $count, $cache);
@@ -576,10 +576,8 @@ class DbMongodb extends Db {
      * @access public
      * @return array
      */
-    public function getFields($collection = '',$database='') {
-        if (!empty($collection) && $collection != $this->_collectionName) {
-            $this->switchCollection($collection, $database, false);
-        }
+    public function getFields($collection = '', $database = '') {
+        $this->switchCollection($collection, $database, false);
         N('db_query', 1);
         if (C('DB_SQL_LOG')) {
             $this->queryStr = $this->_namespace() . '.findOne()';
@@ -610,7 +608,8 @@ class DbMongodb extends Db {
      * 取得当前数据库的collection信息
      * @access public
      */
-    public function getTables() {
+    public function getTables($database = '') {
+        $this->switchCollection('', $database, false);
         if (C('DB_SQL_LOG')) {
             $this->queryStr = $this->_dbName . '.getCollenctionNames()';
         }
@@ -714,13 +713,13 @@ class DbMongodb extends Db {
             $fields = explode(',', $fields);
         }
         $projection = array();
-        foreach ($fields as $field=>$show) {
-            if(is_numeric($show) || is_bool($show)){
+        foreach ($fields as $field => $show) {
+            if (is_numeric($show) || is_bool($show)) {
                 $projection[$field] = $show;
                 continue;
             }
-            $field=$show;
-            $field=trim($field);
+            $field = $show;
+            $field = trim($field);
             $projection[$field] = 1;
         }
         return $projection;
@@ -846,22 +845,108 @@ class DbMongodb extends Db {
         return $query;
     }
 
-    protected function _set(array $record) {
-        $bulk = new MongoDB\Driver\BulkWrite();
-        $bulk->insert($record);
-        $this->_linkID->executeBulkWrite($this->_namespace(), $bulk);
+    /**
+     * 创建索引
+     * @param array $key 索引设置，例如：array('username'=>1)
+     * @param array $options 选项，例如：array('options'=>array('unique' => true))
+     * @return string 返回创建的索引名称
+     */
+    public function createIndex($key, $options = array()) {
+        if (isset($options['table'])) {
+            $this->switchCollection($options['table'], $options['database'], true);
+        }
+        $this->model = $options['model'];
+        $multiple = isset($options['multiple']) && $options['multiple'];
+        $opts = isset($options['options']) ? $options['options'] : array();
+
+        /**
+         * $multiple为true时$key的值格式应为：
+         * array(
+         *    // Create a unique index on the "username" field
+         *    array( 'key' => array( 'username' => 1 ), 'unique' => true ),
+         *    // Create a 2dsphere index on the "loc" field with a custom name
+         *    array( 'key' => array( 'loc' => '2dsphere' ), 'name' => 'geo' ),
+         * )
+         */
+        if($multiple){
+            if(is_string($key)) $key = $this->_parseIndexSetting($key);
+            return $this->_collection->createIndexes($key);
+        }
+        return $this->_collection->createIndex($key, $opts);
     }
 
-    protected function _gets(MongoDB\Driver\Query $objQuery) {
-        $result = array();
-        try {
-            $cursor = $this->_linkID->executeQuery($this->_namespace(), $objQuery);
-            foreach ($cursor as $doc) {
-                $result[] = $doc;
+    /**
+     * 从字符串中获取索引设置，例如：unique:username,-userid;
+     * @param string $key
+     * @return array
+     */
+    private function _parseIndexSetting($key=''){
+        $indexes=explode(';',trim($key));
+        $key=array();
+        foreach($indexes as $index){
+            $index=trim($index);
+            if(!$index)continue;
+            $vi=explode(':',$index);
+            $type='';
+            if(isset($vi[1])){
+                $type=trim($vi[0]);
+                $_fields=explode(',',trim($vi[1]));
+            }else{
+                $_fields=explode(',',trim($vi[0]));
             }
-        } catch (MongoDB\Driver\Exception $e) {
-            throw_exception($e->getMessage());
+            $fields=array();
+            foreach($_fields as $field){
+                $field=trim($field);
+                if(!$field)continue;
+                if($field[0]=='-'){
+                    $fields[]=array(substr($field,1)=>-1);
+                }elseif($field[0]=='+'){
+                    $fields[]=array(substr($field,1)=>1);
+                }else{
+                    $fields[]=array($field=>1);
+                }
+            }
+            $keyset=array('key'=>$fields);
+            if($type)$keyset[$type]=true;
+            $key[]=$keyset;
         }
-        return $result;
+        return $key;
+    }
+
+    /**
+     * 创建表
+     * @param string $table 表名称
+     * @param array $options 选项
+     */
+    public function createTable($table, $options = array()) {
+        $this->switchCollection($options['table'], $options['database'], true);
+        $opts = isset($options['options']) ? $options['options'] : array();
+        $this->_database->createCollection($table, $opts);
+    }
+
+    /**
+     * 删除索引
+     * @param string $indexName 索引名称
+     * @param array $options 选项
+     * @return string 返回创建的索引名称
+     */
+    public function dropIndex($indexName, $options = array()) {
+        if (isset($options['table'])) {
+            $this->switchCollection($options['table'], $options['database'], true);
+        }
+        $this->model = $options['model'];
+        $opts = isset($options['options']) ? $options['options'] : array();
+        return $this->_collection->dropIndex($key, $opts);
+    }
+
+    /**
+     * 删除表
+     * @param string $table 表名称
+     * @param array $options 选项
+     */
+    public function dropTable($table, $options = array()) {
+        $this->switchCollection($options['table'], $options['database'], true);
+        $opts = isset($options['options']) ? $options['options'] : array();
+        $this->_database->dropCollection($table, $opts);
     }
 }
